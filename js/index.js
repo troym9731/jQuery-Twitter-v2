@@ -12,9 +12,8 @@ var User = {
     img: '../images/brad.png'
 };
 
-var renderTweet = function(id, userId, message) {
+var renderTweet = function(userId, message) {
     var tweetObj = {
-        id: id,
         userId: userId,
         message: message
     }
@@ -128,21 +127,14 @@ $(function () {
 
     // Function to trigger POST and GET requests when button is clicked
     var $tweetSection = $('#tweets');
-    // ID counter
-    var id = $.get(tweetsUrl)
-                .done(function(tweets) {
-                    var lastTweet = tweets.length - 1;
-                    return tweets[lastTweet];
-                })
 
     $mainSection.on('click', 'button', function() {
         var $textarea = $(this).closest(composeClass).find('textarea');
         var message = $textarea.val();
 
         if ($(this).parents().is('header')) {
-            var thread = renderTweet(id, User.id, message);
+            var thread = renderTweet(User.id, message);
             $('#tweets').append(thread);
-            id++;
         } else {
             var stringId = $(this).closest('.replies').siblings('.tweet').attr('id');
             var len = stringId.length
