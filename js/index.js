@@ -12,30 +12,48 @@ var User = {
     img: '../images/brad.png'
 };
 
-var renderTweet = function(userId, message) {
+var renderTweet = function(id, userId, message) {
     var tweetObj = {
+        id: id,
         userId: userId,
         message: message
     }
 
     $.post(tweetsUrl, tweetObj)
         .done(function() {
-            loadThreads();
-        })
+            console.log('done');
+        }).fail(function() {
+            console.log('fail');
+        });
+
+    User.message = message;
+    var tweet = templates.tmplTweet(User);
+    var obj = {
+        tweet: tweet
+    };
+    var thread = templates.tmplThread(obj)
+    return thread;
+
 }
 
-var renderReply = function(userId, message) {
+var renderReply = function(userId, message, tweetId) {
     var replyObj = {
         userId: userId,
         tweetId: tweetId,
         message: message
     }
-}
 
-// var renderThread = function(userId, message) {
-//     var tweet = renderTweet(userId, message);
-   
-// }
+    $.post(repliesUrl, replyObj)
+        .done(function() {
+            console.log('done');
+        }).fail(function() {
+            console.log('fail');
+        });
+
+    User.message = message;
+    var reply = templates.tmplTweet(User);
+    return reply;
+}
 
 // Load initial threads from Database
 var loadThreads = function() {
@@ -110,16 +128,29 @@ $(function () {
 
     // Function to trigger POST and GET requests when button is clicked
     var $tweetSection = $('#tweets');
+    // ID counter
+    var id = $.get(tweetsUrl)
+                .done(function(tweets) {
+                    var lastTweet = tweets.length - 1;
+                    return tweets[lastTweet];
+                })
 
     $mainSection.on('click', 'button', function() {
         var $textarea = $(this).closest(composeClass).find('textarea');
         var message = $textarea.val();
-        
 
         if ($(this).parents().is('header')) {
-            renderTweet(User.id, message);
+            var thread = renderTweet(id, User.id, message);
+            $('#tweets').append(thread);
+            id++;
         } else {
-            renderReply(User.id, message);
+            var stringId = $(this).closest('.replies').siblings('.tweet').attr('id');
+            var len = stringId.length
+            var tweetId = stringId.slice(len - 1, len);
+            console.log(tweetId);
+
+            var reply = renderReply(User.id, message, tweetId);
+            $(this).closest('.replies').append(reply);
         }
 
         $textarea.val('');
