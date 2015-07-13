@@ -70,11 +70,14 @@ var loadThreads = function() {
     $.get(tweetsUrl)
         .done(function(tweets) {
             tweets.forEach(function(tweet) {
+                // Get the User ID of the tweet
                 var userId = tweet.userId;
                 var _tweet = tweet;
+                // Store the ID of the tweet as Tweet ID
                 _tweet.tweetId = tweet.id;
                 $.get(usersUrl + userId)
                     .done(function(userInfo) {
+                        // Inside the correct user, add the handle and the image
                         _tweet.handle = userInfo.handle;
                         _tweet.img = userInfo.img;
 
@@ -95,12 +98,15 @@ var loadThreads = function() {
             $.get(repliesUrl)
                 .done(function(replies) {
                     replies.forEach(function(reply) {
+                        // Get the User ID and Tweet ID of the reply
                         var userId = reply.userId;
                         var tweetId = reply.tweetId;
+                        // Save each Reply in a new variable to be passed on
                         var _reply = reply;
 
                         $.get(usersUrl + userId)
                             .done(function(userInfo) {
+                                // Inside the correct user, add the handle and the image
                                 _reply.handle = userInfo.handle;
                                 _reply.img = userInfo.img;
                                 var reply = templates.tmplTweet(_reply);
