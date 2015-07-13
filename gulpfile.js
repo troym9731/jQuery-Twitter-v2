@@ -8,7 +8,7 @@ var jshint = require('gulp-jshint');
 var del = require('del');
 
 gulp.task('lint', function() {
-  return gulp.src('./lib/*.js')
+  return gulp.src('./js/index.js')
     .pipe(jshint())
     .pipe(jshint.reporter('default'));
 });

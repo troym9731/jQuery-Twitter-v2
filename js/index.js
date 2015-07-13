@@ -41,11 +41,8 @@ var renderTweet = function(userId, message) {
             $('#tweets').append(thread);
         }).fail(function() {
             console.log('fail');
-        });
-
-    
-
-}
+        });  
+};
 
 var renderReply = function(userId, message, tweetId) {
     // Object to be posted to the server
@@ -53,7 +50,7 @@ var renderReply = function(userId, message, tweetId) {
         userId: userId,
         tweetId: tweetId,
         message: message
-    }
+    };
     // Posting replyObj to the server
     $.post(repliesUrl, replyObj)
         .done(function() {
@@ -65,7 +62,7 @@ var renderReply = function(userId, message, tweetId) {
     User.message = message;
     var reply = templates.tmplTweet(User);
     return reply;
-}
+};
 
 // Load initial threads from Database
 var loadThreads = function() {
@@ -75,7 +72,7 @@ var loadThreads = function() {
             tweets.forEach(function(tweet) {
                 var userId = tweet.userId;
                 var _tweet = tweet;
-                _tweet.tweetId = tweet.id
+                _tweet.tweetId = tweet.id;
                 $.get(usersUrl + userId)
                     .done(function(userInfo) {
                         _tweet.handle = userInfo.handle;
@@ -91,8 +88,8 @@ var loadThreads = function() {
 
                     }).fail(function() {
                         console.log('fail');
-                    })
-            })
+                    });
+            });
         // Get the Replies
         }).done(function() {
             $.get(repliesUrl)
@@ -119,7 +116,7 @@ var loadThreads = function() {
         }).fail(function() {
             console.log('fail');
         });
-}
+};
 
 // var update = function() {
 //     $.ajax({
