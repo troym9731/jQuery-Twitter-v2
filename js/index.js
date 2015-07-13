@@ -13,17 +13,20 @@ var User = {
 };
 
 var renderTweet = function(userId, message) {
+    // Object to be posted to the server
     var tweetObj = {
         userId: userId,
         message: message
     };
 
+    // Post object to the server
     $.post(tweetsUrl, tweetObj)
         .done(function(){
             console.log('done');
         }).fail(function() {
             console.log('fail');
         });
+    // Getting the tweet id to add to the object to be appended
     $.get(tweetsUrl)
         .done(function(tweets) {
             var lastTweet = tweets[tweets.length - 1];
@@ -45,12 +48,13 @@ var renderTweet = function(userId, message) {
 }
 
 var renderReply = function(userId, message, tweetId) {
+    // Object to be posted to the server
     var replyObj = {
         userId: userId,
         tweetId: tweetId,
         message: message
     }
-
+    // Posting replyObj to the server
     $.post(repliesUrl, replyObj)
         .done(function() {
             console.log('done');
@@ -65,6 +69,7 @@ var renderReply = function(userId, message, tweetId) {
 
 // Load initial threads from Database
 var loadThreads = function() {
+    // Get the Tweets
     $.get(tweetsUrl)
         .done(function(tweets) {
             tweets.forEach(function(tweet) {
@@ -89,7 +94,6 @@ var loadThreads = function() {
                     })
             })
         // Get the Replies
-
         }).done(function() {
             $.get(repliesUrl)
                 .done(function(replies) {
@@ -117,8 +121,24 @@ var loadThreads = function() {
         });
 }
 
+// var update = function() {
+//     $.ajax({
+//         url: tweetsUrl + 6, // or repliesUrl
+//         type: 'PUT',
+//         data: {
+//             id: 6, // id
+//             message: 'jake' // message
+//         }
+//     }).done(function() {
+//         console.log('done');
+//     }).fail(function() {
+//         console.log('fail');
+//     });
+// }
+
 $(function () {
 
+    // update();
     loadThreads();
 
     // Expand functions for textarea and threads
