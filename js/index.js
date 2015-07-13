@@ -21,18 +21,10 @@ var renderTweet = function(userId, message) {
 
     // Post object to the server
     $.post(tweetsUrl, tweetObj)
-        .done(function(){
-            console.log('done');
-        }).fail(function() {
-            console.log('fail');
-        });
-    // Getting the tweet id to add to the object to be appended
-    $.get(tweetsUrl)
-        .done(function(tweets) {
-            var lastTweet = tweets[tweets.length - 1];
-            User.tweetId = lastTweet.id;
+        .done(function(tweet){
+            User.tweetId = tweet.id;
             User.message = message;
-            
+
             var tweet = templates.tmplTweet(User);
             var obj = {
                 tweet: tweet
@@ -41,7 +33,7 @@ var renderTweet = function(userId, message) {
             $('#tweets').append(thread);
         }).fail(function() {
             console.log('fail');
-        });  
+        });
 };
 
 var renderReply = function(userId, message, tweetId) {
@@ -140,7 +132,7 @@ var loadThreads = function() {
 // }
 
 $(function () {
-
+    
     // update();
     loadThreads();
 
