@@ -77,7 +77,7 @@ gulp.task('serve', ['serve:api', 'serve:web'])
 // Watch
 
 gulp.task('watch', function() {
-    gulp.watch(['./js/*.js', '!./js/bundle.js'], ['build']);
+    gulp.watch(['./js/*.js', '!./js/bundle.js'], ['uglify']);
 });
 
 // Default
