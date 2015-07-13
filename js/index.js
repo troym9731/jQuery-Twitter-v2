@@ -16,22 +16,31 @@ var renderTweet = function(userId, message) {
     var tweetObj = {
         userId: userId,
         message: message
-    }
+    };
 
     $.post(tweetsUrl, tweetObj)
-        .done(function() {
+        .done(function(){
             console.log('done');
         }).fail(function() {
             console.log('fail');
         });
+    $.get(tweetsUrl)
+        .done(function(tweets) {
+            var lastTweet = tweets[tweets.length - 1];
+            User.tweetId = lastTweet.id;
+            User.message = message;
+            
+            var tweet = templates.tmplTweet(User);
+            var obj = {
+                tweet: tweet
+            };
+            var thread = templates.tmplThread(obj);
+            $('#tweets').append(thread);
+        }).fail(function() {
+            console.log('fail');
+        });
 
-    User.message = message;
-    var tweet = templates.tmplTweet(User);
-    var obj = {
-        tweet: tweet
-    };
-    var thread = templates.tmplThread(obj)
-    return thread;
+    
 
 }
 
@@ -60,8 +69,8 @@ var loadThreads = function() {
         .done(function(tweets) {
             tweets.forEach(function(tweet) {
                 var userId = tweet.userId;
-                var tweetId = tweet.id;
                 var _tweet = tweet;
+                _tweet.tweetId = tweet.id
                 $.get(usersUrl + userId)
                     .done(function(userInfo) {
                         _tweet.handle = userInfo.handle;
@@ -133,13 +142,12 @@ $(function () {
         var message = $textarea.val();
 
         if ($(this).parents().is('header')) {
-            var thread = renderTweet(User.id, message);
-            $('#tweets').append(thread);
+            renderTweet(User.id, message);
+            
         } else {
             var stringId = $(this).closest('.replies').siblings('.tweet').attr('id');
             var len = stringId.length
             var tweetId = stringId.slice(len - 1, len);
-            console.log(tweetId);
 
             var reply = renderReply(User.id, message, tweetId);
             $(this).closest('.replies').append(reply);
