@@ -41,6 +41,15 @@ gulp.task('build', ['clean'], function () {
     .pipe(gulp.dest('js'));
 });
 
+// Uglify
+var uglify = require('gulp-uglify');
+
+gulp.task('uglify', ['build'], function() {
+  return gulp.src('js/bundle.js')
+    .pipe(uglify())
+    .pipe(gulp.dest('js'));
+});
+
 // API Server
 var jsonServer = require('json-server');
 
@@ -73,4 +82,4 @@ gulp.task('watch', function() {
 
 // Default
 
-gulp.task('default', ['watch', 'serve', 'lint', 'build']);
+gulp.task('default', ['watch', 'serve', 'lint', 'uglify']);
