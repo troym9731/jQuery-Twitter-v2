@@ -167,8 +167,6 @@ $(function () {
             });
     });
 
-
-
     // update();
     loadThreads();
 
@@ -186,7 +184,6 @@ $(function () {
     });
 
     // Function to trigger POST and GET requests when button is clicked
-    var $tweetSection = $('#tweets');
 
     $mainSection.on('click', 'button', function() {
         var $textarea = $(this).closest(composeClass).find('textarea');
@@ -194,10 +191,9 @@ $(function () {
 
         if ($(this).parents().is('header')) {
             renderTweet(User.id, message);
-            
         } else {
             var stringId = $(this).closest('.replies').siblings('.tweet').attr('id');
-            var len = stringId.length
+            var len = stringId.length;
             var tweetId = stringId.slice(len - 1, len);
 
             var reply = renderReply(User.id, message, tweetId);
