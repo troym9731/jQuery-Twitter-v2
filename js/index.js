@@ -71,7 +71,6 @@ var getEachTweet = function(tweets) {
         var _tweet = tweet;
         // Store the ID of the tweet as Tweet ID
         _tweet.tweetId = tweet.id;
-        console.log(tweet)
 
         $.get(usersUrl + userId)
             .done(function(userInfo) {
@@ -97,7 +96,6 @@ var getEachReply = function(replies) {
         var tweetId = reply.tweetId;
         // Save each Reply in a new variable to be passed on
         var _reply = reply;
-        console.log(reply)
 
         $.get(usersUrl + userId)
             .done(function(userInfo) {
@@ -116,17 +114,14 @@ var getEachReply = function(replies) {
 // Load initial threads from Database
 var loadThreads = function() {
     // Get the Tweets
-   getTweets()
+    getTweets()
         .done(getEachTweet)
-        // Get the Replies
-        .done(getReplies)
-            .done(getEachReply)
-            .fail(function() {
-                    console.log('fail');
-                })
         .fail(function() {
             console.log('fail');
-        })
+        });
+        // Get the Replies
+    getReplies()
+        .done(getEachReply)
         .fail(function() {
             console.log('fail');
         });
