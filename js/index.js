@@ -132,6 +132,20 @@ var loadThreads = function() {
         });
 };
 
+// Get all Users and append to dropdown
+
+var getUsers = function() {
+    $.get(usersUrl)
+        .done(function(users) {
+            users.forEach(function(user) {
+                var option = templates.tmplOption(user);
+                $('#users').append(option);
+            })
+        }).fail(function() {
+            console.log('fail');
+        });
+};
+
 // var update = function() {
 //     $.ajax({
 //         url: tweetsUrl + 6, // or repliesUrl
@@ -148,7 +162,27 @@ var loadThreads = function() {
 // }
 
 $(function () {
-    
+    // Get Users to fill dropdown box
+    getUsers();
+
+    $('#users').on('change', function() {
+        var id = $('option:selected').val();
+        $.get(usersUrl)
+            .done(function(users) {
+                users.forEach(function(user) {
+                    if (id == user.id) {
+                        User = {
+                            id: user.id,
+                            handle: user.handle,
+                            img: user.img
+                        }
+                    }
+                })
+            }).fail(function() {
+                console.log('fail');
+            });
+    });
+
     // update();
     loadThreads();
 
@@ -166,7 +200,6 @@ $(function () {
     });
 
     // Function to trigger POST and GET requests when button is clicked
-    var $tweetSection = $('#tweets');
 
     $mainSection.on('click', 'button', function() {
         var $textarea = $(this).closest(composeClass).find('textarea');
@@ -174,10 +207,9 @@ $(function () {
 
         if ($(this).parents().is('header')) {
             renderTweet(User.id, message);
-            
         } else {
             var stringId = $(this).closest('.replies').siblings('.tweet').attr('id');
-            var len = stringId.length
+            var len = stringId.length;
             var tweetId = stringId.slice(len - 1, len);
 
             var reply = renderReply(User.id, message, tweetId);
