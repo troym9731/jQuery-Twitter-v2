@@ -44,11 +44,11 @@ gulp.task('build', ['clean'], function () {
 // Uglify
 var uglify = require('gulp-uglify');
 
-gulp.task('uglify', ['build'], function() {
-  return gulp.src('js/bundle.js')
-    .pipe(uglify())
-    .pipe(gulp.dest('js'));
-});
+// gulp.task('uglify', ['build'], function() {
+//   return gulp.src('js/bundle.js')
+//     .pipe(uglify())
+//     .pipe(gulp.dest('js'));
+// });
 
 // API Server
 var jsonServer = require('json-server');
@@ -77,9 +77,9 @@ gulp.task('serve', ['serve:api', 'serve:web'])
 // Watch
 
 gulp.task('watch', function() {
-    gulp.watch(['./js/*.js', '!./js/bundle.js'], ['uglify']);
+    gulp.watch(['./js/*.js', '!./js/bundle.js'], ['build']);
 });
 
 // Default
 
-gulp.task('default', ['watch', 'serve', 'lint', 'uglify']);
+gulp.task('default', ['watch', 'serve', 'lint', 'build']);
