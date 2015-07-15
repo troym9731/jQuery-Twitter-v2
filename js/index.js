@@ -64,6 +64,15 @@ var getReplies = function() {
     return $.get(repliesUrl);
 }
 
+var getUserInfo = function(userInfo, _tweet, next) {
+    _tweet.handle = userInfo.handle;
+    _tweet.img = userInfo.img;
+
+    var tweet = templates.tmplTweet(_tweet);
+
+    next(tweet);
+}
+
 var getEachTweet = function(tweets) {
     tweets.forEach(function(tweet) {
         // Get the User ID of the tweet
@@ -74,17 +83,13 @@ var getEachTweet = function(tweets) {
 
         $.get(usersUrl + userId)
             .done(function(userInfo) {
-                // Inside the correct user, add the handle and the image
-                _tweet.handle = userInfo.handle;
-                _tweet.img = userInfo.img;
-
-                var tweet = templates.tmplTweet(_tweet);
-                var obj = {
-                    tweet: tweet
-                };
-
-                var thread = templates.tmplThread(obj);
-                $('#tweets').append(thread);
+                getUserInfo(userInfo, _tweet, function(tweet) {
+                    var obj = {
+                        tweet: tweet
+                    };
+                    var thread = templates.tmplThread(obj);
+                    $('#tweets').append(thread);
+                })
         })
     })
 }
@@ -99,14 +104,18 @@ var getEachReply = function(replies) {
 
         $.get(usersUrl + userId)
             .done(function(userInfo) {
-                // Inside the correct user, add the handle and the image
-                _reply.handle = userInfo.handle;
-                _reply.img = userInfo.img;
-                var reply = templates.tmplTweet(_reply);
+                getUserInfo(userInfo, _reply, function(tweet) {
+                    var $search = $('#tweet-' + tweetId);
+                    $search.siblings('.replies').append(tweet);
+                })
+                // // Inside the correct user, add the handle and the image
+                // _reply.handle = userInfo.handle;
+                // _reply.img = userInfo.img;
+                // var reply = templates.tmplTweet(_reply);
 
-                var $search = $('#tweet-' + tweetId);
+                // var $search = $('#tweet-' + tweetId);
 
-                $search.siblings('.replies').append(reply);
+                // $search.siblings('.replies').append(reply);
         })
     })
 }
