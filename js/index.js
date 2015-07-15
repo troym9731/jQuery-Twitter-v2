@@ -116,8 +116,8 @@ var getEachReply = function(replies) {
                 // var $search = $('#tweet-' + tweetId);
 
                 // $search.siblings('.replies').append(reply);
+            })
         })
-    })
 }
 
 // Load initial threads from Database
