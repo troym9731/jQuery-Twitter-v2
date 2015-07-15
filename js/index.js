@@ -90,7 +90,7 @@ var getEachTweet = function(tweets) {
                     var thread = templates.tmplThread(obj);
                     $('#tweets').append(thread);
                 })
-        })
+            })
     })
 }
 
@@ -108,16 +108,8 @@ var getEachReply = function(replies) {
                     var $search = $('#tweet-' + tweetId);
                     $search.siblings('.replies').append(tweet);
                 })
-                // // Inside the correct user, add the handle and the image
-                // _reply.handle = userInfo.handle;
-                // _reply.img = userInfo.img;
-                // var reply = templates.tmplTweet(_reply);
-
-                // var $search = $('#tweet-' + tweetId);
-
-                // $search.siblings('.replies').append(reply);
             })
-        })
+    })
 }
 
 // Load initial threads from Database
