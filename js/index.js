@@ -2,15 +2,17 @@
 
 var $ = require('jquery');
 var templates = require('./template');
-var usersUrl = 'http://localhost:3000/users/';
-var tweetsUrl = 'http://localhost:3000/tweets/';
-var repliesUrl = 'http://localhost:3000/replies/';
+var baseUrl = 'http://localhost:3000/';
 
 var User = {
     id: 1,
     handle: '@bradwestfall',
     img: '../images/brad.png'
 };
+
+var fail = function() {
+    console.log('fail');
+}
 
 var renderTweet = function(userId, message) {
     // Object to be posted to the server
@@ -20,7 +22,7 @@ var renderTweet = function(userId, message) {
     };
 
     // Post object to the server
-    $.post(tweetsUrl, tweetObj)
+    $.post(baseUrl + 'tweets', tweetObj)
         .done(function(tweet){
             User.tweetId = tweet.id;
             User.message = message;
@@ -31,9 +33,7 @@ var renderTweet = function(userId, message) {
             };
             var thread = templates.tmplThread(obj);
             $('#tweets').append(thread);
-        }).fail(function() {
-            console.log('fail');
-        });
+        }).fail(fail)
 };
 
 var renderReply = function(userId, message, tweetId) {
@@ -44,126 +44,116 @@ var renderReply = function(userId, message, tweetId) {
         message: message
     };
     // Posting replyObj to the server
-    $.post(repliesUrl, replyObj)
+    $.post(baseUrl + 'replies', replyObj)
         .done(function() {
             console.log('done');
-        }).fail(function() {
-            console.log('fail');
-        });
+        }).fail(fail)
 
     User.message = message;
     var reply = templates.tmplTweet(User);
     return reply;
 };
 
+var getUsers = function() {
+    return $.get(baseUrl + 'users');
+}
+
 var getTweets = function() {
-    return $.get(tweetsUrl);
+    return $.get(baseUrl + 'tweets')
 }
 
 var getReplies = function() {
-    return $.get(repliesUrl);
+    return $.get(baseUrl + 'replies')
 }
 
-var getUserInfo = function(userInfo, _tweet, next) {
-    _tweet.handle = userInfo.handle;
-    _tweet.img = userInfo.img;
+var appendTweets = function(tweets) {
+    tweets
+        .sort(function(a, b) {
+            return a.id - b.id;
+        })
+        .forEach(function(tweet) {
+            var tweetHtml = templates.tmplTweet(tweet);
+            var obj = {
+                tweet: tweetHtml
+            };
 
-    var tweet = templates.tmplTweet(_tweet);
-
-    next(tweet);
+            var thread = templates.tmplThread(obj);
+            $('#tweets').append(thread);
+        })
 }
 
-var getEachTweet = function(tweets) {
-    tweets.forEach(function(tweet) {
-        // Get the User ID of the tweet
-        var userId = tweet.userId;
-        var _tweet = tweet;
-        // Store the ID of the tweet as Tweet ID
-        _tweet.tweetId = tweet.id;
-
-        $.get(usersUrl + userId)
-            .done(function(userInfo) {
-                getUserInfo(userInfo, _tweet, function(tweet) {
-                    var obj = {
-                        tweet: tweet
-                    };
-                    var thread = templates.tmplThread(obj);
-                    $('#tweets').append(thread);
-                })
-            })
-    })
+var getUserTweets = function(users) {
+    getTweets()
+        .done(function(tweets) {
+            for (var i = 0; i < users.length; i++) {
+                for(var j = 0; j < tweets.length; j++) {
+                    if (users[i].id === tweets[j].userId) {
+                        tweets[j].handle = users[i].handle;
+                        tweets[j].img = users[i].img;
+                        tweets[j].tweetId = tweets[j].id
+                    }
+                }
+            }
+            appendTweets(tweets);
+        })
 }
 
-var getEachReply = function(replies) {
-    replies.forEach(function(reply) {
-        // Get the User ID and Tweet ID of the reply
-        var userId = reply.userId;
-        var tweetId = reply.tweetId;
-        // Save each Reply in a new variable to be passed on
-        var _reply = reply;
+var appendReplies = function(replies) {
+    replies
+        .sort(function(a, b) {
+            return a.id - b.id;
+        })
+        .forEach(function(reply) {
+            var replyHtml = templates.tmplTweet(reply);
 
-        $.get(usersUrl + userId)
-            .done(function(userInfo) {
-                getUserInfo(userInfo, _reply, function(tweet) {
-                    var $search = $('#tweet-' + tweetId);
-                    $search.siblings('.replies').append(tweet);
-                })
-            })
-    })
+            var $search = $('#tweet-' + reply.tweetId);
+            $search.siblings('.replies').append(replyHtml);
+
+        })
+}
+
+var getUserReplies = function(users) {
+    getReplies()
+        .done(function(replies) {
+            for (var i = 0; i < users.length; i++) {
+                for(var j = 0; j < replies.length; j++) {
+                    if (users[i].id === replies[j].userId) {
+                        replies[j].handle = users[i].handle;
+                        replies[j].img = users[i].img;
+                    }
+                }
+            }
+            appendReplies(replies);
+        })
 }
 
 // Load initial threads from Database
+
 var loadThreads = function() {
-    // Get the Tweets
-    getTweets()
-        .done(getEachTweet)
-        .fail(function() {
-            console.log('fail');
-        });
-        // Get the Replies
-    getReplies()
-        .done(getEachReply)
-        .fail(function() {
-            console.log('fail');
-        });
-};
+    getUsers()
+        .done(getUserTweets)
+        .done(getUserReplies)
+}
 
 // Get all Users and append to dropdown
 
-var getUsers = function() {
-    $.get(usersUrl)
+var dropdown = function() {
+    getUsers()
         .done(function(users) {
             users.forEach(function(user) {
                 var option = templates.tmplOption(user);
                 $('#users').append(option);
             })
-        }).fail(function() {
-            console.log('fail');
-        });
+        }).fail(fail)
 };
-
-// var update = function() {
-//     $.ajax({
-//         url: tweetsUrl + 6, // or repliesUrl
-//         type: 'PUT',
-//         data: {
-//             id: 6, // id
-//             message: 'jake' // message
-//         }
-//     }).done(function() {
-//         console.log('done');
-//     }).fail(function() {
-//         console.log('fail');
-//     });
-// }
 
 $(function () {
     // Get Users to fill dropdown box
-    getUsers();
+    dropdown();
 
     $('#users').on('change', function() {
         var id = $('option:selected').val();
-        $.get(usersUrl)
+        getUsers()
             .done(function(users) {
                 users.forEach(function(user) {
                     if (id == user.id) {
@@ -174,12 +164,9 @@ $(function () {
                         }
                     }
                 })
-            }).fail(function() {
-                console.log('fail');
-            });
+            }).fail(fail)
     });
 
-    // update();
     loadThreads();
 
     // Expand functions for textarea and threads
