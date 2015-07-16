@@ -90,7 +90,7 @@ var getUserTweets = function(users) {
                     if (users[i].id === tweets[j].userId) {
                         tweets[j].handle = users[i].handle;
                         tweets[j].img = users[i].img;
-                        tweets[j].tweetId = tweets[j].id
+                        tweets[j].tweetId = tweets[j].id;
                     }
                 }
             }
